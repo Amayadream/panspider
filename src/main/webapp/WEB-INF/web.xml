@@ -6,7 +6,7 @@
     <display-name>Archetype Created Web Application</display-name>
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:spring/spring-mongodb.xml</param-value>
+        <param-value>classpath:spring/spring-mongodb.xml;classpath:spring/spring-redis.xml</param-value>
     </context-param>
 
     <listener>
