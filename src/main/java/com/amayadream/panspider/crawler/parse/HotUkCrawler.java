@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @author :  Amayadream
@@ -31,7 +32,8 @@ public class HotUkCrawler {
     public void getHotUK() throws InterruptedException {
         Integer i = 0;
         String url;
-        HotUk uk = new HotUk(false);
+        Date now = new Date();
+        HotUk uk = new HotUk(now, null);
         while (true) {
             url = Constants.HOT_UK_URL.replace("{start}", String.valueOf(i));
             i ++;
