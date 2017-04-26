@@ -40,7 +40,7 @@ public class HttpClientUtils {
             .setConnectionRequestTimeout(5000)
             .build();
 
-    public static String getRequest(String url) {
+    public static String getRequest(String url){
         return getRequest(url, null);
     }
 
@@ -52,10 +52,12 @@ public class HttpClientUtils {
         if (headers != null && headers.length > 0) {
             get.setHeaders(ArrayUtils.addAll(HTTP_COMMON_HEADER, headers));
         }
+        HttpResponse response = null;
+        HttpEntity entity = null;
         try {
-            HttpResponse response = client.execute(get);
+            response = client.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
-                HttpEntity entity = response.getEntity();
+                entity = response.getEntity();
                 return EntityUtils.toString(entity, Constants.CHARSET_UTF8);
             }
             logger.warn("请求发生错误, 状态码: {}", response.getStatusLine().getStatusCode());
@@ -63,6 +65,12 @@ public class HttpClientUtils {
         } catch (IOException e) {
             logger.error("请求失败, 错误原因: {}", e.getMessage());
             return null;
+        } finally {
+            try {
+                EntityUtils.consume(entity);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

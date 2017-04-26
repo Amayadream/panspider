@@ -1,4 +1,4 @@
-package com.amayadream.panspider.crawler;
+package com.amayadream.panspider.common.util;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -15,10 +15,23 @@ public class RedisManager {
         this.jedisPool = jedisPool;
     }
 
+    /**
+     * 获取Jedis对象
+     * @return
+     */
     public synchronized Jedis initResource() {
         if (jedisPool == null)
             return null;
         return jedisPool.getResource();
+    }
+
+    /**
+     * 释放Jedis对象
+     * @param jedis
+     */
+    public synchronized void releaseResource(Jedis jedis) {
+        if (jedis != null)
+            jedis.close();
     }
 
     public JedisPool getJedisPool() {

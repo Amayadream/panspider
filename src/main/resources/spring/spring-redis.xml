@@ -7,7 +7,7 @@
 
     <context:property-placeholder location="classpath:config/config.properties" />
 
-    <bean id="redisManager" class="com.amayadream.panspider.crawler.RedisManager">
+    <bean id="redisManager" class="com.amayadream.panspider.common.util.RedisManager">
         <constructor-arg name="jedisPool" ref="jedisPool"/>
     </bean>
 

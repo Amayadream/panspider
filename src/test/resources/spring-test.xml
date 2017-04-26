@@ -56,6 +56,10 @@
         <constructor-arg name="databaseName" value="${mongo.name}"/>
     </bean>
 
+    <bean id="redisManager" class="com.amayadream.panspider.common.util.RedisManager">
+        <constructor-arg name="jedisPool" ref="jedisPool"/>
+    </bean>
+
     <!-- redis连接池配置 -->
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
         <!--最大连接数, 默认1000个-->
@@ -86,9 +90,9 @@
         <constructor-arg name="poolConfig" ref="poolConfig"/>
         <constructor-arg name="host" value="${redis.single.host}"/>
         <constructor-arg name="port" value="${redis.single.port}"/>
-        <constructor-arg name="password" value="${redis.single.password}" />
+        <!--<constructor-arg name="password" value="${redis.single.password}" />-->
         <constructor-arg name="timeout" value="${redis.timeout}" />
-        <constructor-arg name="database" value="${redis.database.index}" />
+        <!--<constructor-arg name="database" value="${redis.database.index}" />-->
     </bean>
 
 </beans>

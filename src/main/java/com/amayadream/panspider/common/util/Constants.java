@@ -12,8 +12,15 @@ public class Constants {
 
     public static final String CHARSET_UTF8 = "utf-8";
 
-    public static String HOT_UK_URL = "http://yun.baidu.com/pcloud/friend/gethotuserlist?type=1&from=feed&start={start}&limit=24&bdstoken=ac95ef31d3979f6ee707ef75cee9f5c5&clienttype=0&web=1";
+    public static String URL_HOT_UK = "http://yun.baidu.com/pcloud/friend/gethotuserlist?start={start}&limit=24";
+    public static String URL_FANS = "http://pan.baidu.com/pcloud/friend/getfanslist?query_uk={uk}&limit=24&start={start}";
+    public static String URL_FOLLOW = "http://yun.baidu.com/pcloud/friend/getfollowlist?query_uk={uk}&limit=24&start={start}";
 
     public static Header HTTP_HEADER_REFERER = new BasicHeader(HttpHeaders.REFERER, "https://pan.baidu.com/share/home");
+
+    /** 存储uk的redis list */
+    public static final String REDIS_KEY_UK_LIST = "uk_list";
+    /** 存储正在处理的uk的redis list */
+    public static final String REDIS_KEY_UK_TEMP_LIST = "uk_temp_list";
 
 }
