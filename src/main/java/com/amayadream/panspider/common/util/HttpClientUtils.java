@@ -33,6 +33,7 @@ public class HttpClientUtils {
             new BasicHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate"),
             new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.8"),
     };
+
     private static final RequestConfig HTTP_REQUEST_CONFIG = RequestConfig.custom()
             .setConnectTimeout(5000)
             .setSocketTimeout(5000)

@@ -5,7 +5,6 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
-       xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
                         http://www.springframework.org/schema/context
@@ -59,40 +58,37 @@
 
     <!-- redis连接池配置 -->
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxIdle" value="${redis.pool.maxIdle}" />
-        <property name="maxTotal" value="${redis.pool.maxActive}" />
-        <property name="maxWaitMillis" value="${redis.pool.maxWait}" />
-        <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+        <!--最大连接数, 默认1000个-->
+        <property name="maxTotal" value="${redis.pool.maxTotal}"/>
+        <!--最小空闲连接数, 默认0-->
+        <property name="minIdle" value="${redis.pool.minIdle}"/>
+        <!--获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间, 默认-1-->
+        <property name="maxWaitMillis" value="${redis.pool.maxWaitTime}"/>
+        <!--最大空闲连接数, 默认20个-->
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <!--在获取连接的时候检查有效性, 默认false-->
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+        <property name="testOnReturn" value="false"/>
+        <!--在空闲时检查有效性, 默认false-->
+        <property name="testWhileIdle" value="false"/>
+        <!--逐出连接的最小空闲时间 默认1800000毫秒(30分钟)-->
+        <property name="minEvictableIdleTimeMillis" value="1800000"/>
+        <!--每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3-->
+        <property name="numTestsPerEvictionRun" value="3"/>
+        <!--对象空闲多久后逐出, 当空闲时间>该值 且 空闲连接>最大空闲数 时直接逐出,不再根据MinEvictableIdleTimeMillis判断 (默认逐出策略)-->
+        <property name="softMinEvictableIdleTimeMillis" value="1800000"/>
+        <!--逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1-->
+        <property name="timeBetweenEvictionRunsMillis" value="-1"/>
     </bean>
 
-    <!-- redis连接工厂 -->
-    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-        <property name="usePool" value="true"/>
-        <property name="hostName" value="${redis.host}" />
-        <property name="port" value="${redis.port}" />
-        <!--<property name="password" value="${redis.pass}" />-->
-        <property name="timeout" value="${redis.timeout}" />
-        <property name="database" value="${redis.default.db}"/>
-        <constructor-arg index="0" ref="poolConfig" />
-    </bean>
-
-    <!-- redisTemplate配置 -->
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-        <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="keySerializer">
-            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
-        </property>
-        <property name="valueSerializer">
-            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
-        </property>
-    </bean>
-
-    <!-- 启用缓存注解 -->
-    <cache:annotation-driven />
-
-    <!-- redis缓存管理器 -->
-    <bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
-        <constructor-arg ref="redisTemplate"/>
+    <!-- redis连接池 -->
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg name="poolConfig" ref="poolConfig"/>
+        <constructor-arg name="host" value="${redis.single.host}"/>
+        <constructor-arg name="port" value="${redis.single.port}"/>
+        <constructor-arg name="password" value="${redis.single.password}" />
+        <constructor-arg name="timeout" value="${redis.timeout}" />
+        <constructor-arg name="database" value="${redis.database.index}" />
     </bean>
 
 </beans>
