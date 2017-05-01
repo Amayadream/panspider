@@ -1,8 +1,9 @@
 package com.amayadream.panspider.crawler;
 
-import com.amayadream.panspider.crawler.exec.ShareCrawlerTask;
-import com.amayadream.panspider.crawler.exec.UkCrawlerTask;
-import com.amayadream.panspider.crawler.exec.UkStorage;
+import com.amayadream.panspider.crawler.exec.*;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -15,26 +16,28 @@ import java.util.concurrent.Executors;
  */
 public class TaskExecutor {
 
-    public static void main(String[] args) {
-        JedisPool pool = new JedisPool();
-        Jedis jedis = pool.getResource();
+    public static void main(String[] args) throws InterruptedException {
+
+        ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"classpath*:spring/*.xml"});
+        BeanFactory factory = (BeanFactory) context;
+
+        JedisPool pool = factory.getBean(JedisPool.class);
+        Jedis jedis1 = pool.getResource();
+        Jedis jedis2 = pool.getResource();
+        Jedis jedis3 = pool.getResource();
 
         UkStorage storage = new UkStorage();
 
         ExecutorService service = Executors.newCachedThreadPool();
-        UkCrawlerTask product1 = new UkCrawlerTask(jedis, storage);
-        UkCrawlerTask product2 = new UkCrawlerTask(jedis, storage);
-        UkCrawlerTask product3 = new UkCrawlerTask(jedis, storage);
-        ShareCrawlerTask consume1 = new ShareCrawlerTask(jedis, storage);
-        ShareCrawlerTask consume2 = new ShareCrawlerTask(jedis, storage);
 
-        service.execute(product1);
-        service.execute(product2);
-        service.execute(product3);
+        HotUkCrawlerTask hotUkTask = new HotUkCrawlerTask(jedis1, storage);
+        UkFansCrawlerTask fansTask = new UkFansCrawlerTask(jedis2, storage);
+        UkFollowCrawlerTask followTask = new UkFollowCrawlerTask(jedis3, storage);
 
-        service.execute(consume1);
-        service.execute(consume2);
-
+        service.execute(hotUkTask);
+        Thread.sleep(10000);
+        service.execute(fansTask);
+        service.execute(followTask);
     }
 
 }

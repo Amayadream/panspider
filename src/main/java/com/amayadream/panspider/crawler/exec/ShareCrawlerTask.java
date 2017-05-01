@@ -31,27 +31,4 @@ public class ShareCrawlerTask implements Runnable {
         }
     }
 
-    public boolean isFlag() {
-        return flag;
-    }
-
-    public void setFlag(boolean flag) {
-        this.flag = flag;
-    }
-
-    public Jedis getJedis() {
-        return jedis;
-    }
-
-    public void setJedis(Jedis jedis) {
-        this.jedis = jedis;
-    }
-
-    public UkStorage getStorage() {
-        return storage;
-    }
-
-    public void setStorage(UkStorage storage) {
-        this.storage = storage;
-    }
 }

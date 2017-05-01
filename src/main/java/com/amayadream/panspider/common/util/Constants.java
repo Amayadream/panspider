@@ -5,6 +5,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.message.BasicHeader;
 
 /**
+ * 常量定义
  * @author :  Amayadream
  * @date :  2017.04.21 23:30
  */
@@ -18,9 +19,14 @@ public class Constants {
 
     public static Header HTTP_HEADER_REFERER = new BasicHeader(HttpHeaders.REFERER, "https://pan.baidu.com/share/home");
 
-    /** 存储uk的redis list */
+    /** 存储待处理uk的redis list */
     public static final String REDIS_KEY_UK_LIST = "uk_list";
-    /** 存储正在处理的uk的redis list */
-    public static final String REDIS_KEY_UK_TEMP_LIST = "uk_temp_list";
+    /** 存储使用过的uk的set */
+    public static final String REDIS_KEY_UK_USED_SET = "uk_used_set";
+    /** 存储已存在的uk的set */
+    public static final String REDIS_KEY_UK_EXIST_SET = "uk_exist_set";
+    /** 存储等待爬取粉丝和订阅的uk list */
+    public static final String REDIS_KEY_UK_EXIST_TEMP_LIST = "uk_exist_temp_list";
+
 
 }
