@@ -37,19 +37,19 @@ public class UkStorage {
      * 从临时队列中取出一条uk, 查询粉丝和订阅
      * 如果临时队列为空, 则复制uk_exist_set的元素填充到临时队列中
      */
-    public synchronized String get(Jedis jedis) {
-        if (jedis.llen(Constants.REDIS_KEY_UK_EXIST_TEMP_LIST) == 0) {
+    public synchronized String get(Jedis jedis, String key) {
+        if (jedis.llen(key) == 0) {
             //如果队列为空, 则复制uk_exist_set元素填充到队列中
             Set<String> set = jedis.smembers(Constants.REDIS_KEY_UK_EXIST_SET);
             String[] arr = new String[]{};
             arr = set.toArray(arr);
             if (arr.length == 0)
-                return get(jedis);
-            jedis.rpush(Constants.REDIS_KEY_UK_EXIST_TEMP_LIST, arr);
-            return get(jedis);
+                return get(jedis, key);
+            jedis.rpush(key, arr);
+            return get(jedis, key);
         } else {
             //如果不为空则取出最新的一条
-            return jedis.blpop(0, Constants.REDIS_KEY_UK_EXIST_TEMP_LIST).get(1);
+            return jedis.blpop(0, key).get(1);
         }
     }
 

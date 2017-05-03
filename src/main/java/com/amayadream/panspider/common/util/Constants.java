@@ -26,7 +26,16 @@ public class Constants {
     /** 存储已存在的uk的set */
     public static final String REDIS_KEY_UK_EXIST_SET = "uk_exist_set";
     /** 存储等待爬取粉丝和订阅的uk list */
-    public static final String REDIS_KEY_UK_EXIST_TEMP_LIST = "uk_exist_temp_list";
+    public static final String REDIS_KEY_UK_EXIST_FOLLOW_LIST = "uk_exist_follow_list";
+    public static final String REDIS_KEY_UK_EXIST_FANS_LIST = "uk_exist_fans_list";
+
+    public static final Long THREAD_SLEEP_HOT_COMMON = 500L;
+    public static final Long THREAD_SLEEP_HOT_ERROR = 5000L;
+
+    public static final Long THREAD_SLEEP_COMMON = 5000L;
+    public static final Long THREAD_SLEEP_ERROR = 5000L;
+
+
 
 
 }

@@ -51,7 +51,7 @@ public class HotUkCrawlerTask implements Runnable {
             String result = HttpClientUtils.getRequest(url);
             if (result == null) {
                 logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
-                Thread.sleep(1000);
+                Thread.sleep(Constants.THREAD_SLEEP_HOT_ERROR);
                 continue;
             }
             JSONObject o = JSON.parseObject(result);
@@ -64,12 +64,12 @@ public class HotUkCrawlerTask implements Runnable {
                         storage.product(jedis, u.getString("hot_uk"));
                     });
                     //成功后休眠1s
-                    Thread.sleep(1000);
+                    Thread.sleep(Constants.THREAD_SLEEP_HOT_COMMON);
                 } else
                     break;
             } else {
                 logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
-                Thread.sleep(2000);
+                Thread.sleep(Constants.THREAD_SLEEP_HOT_ERROR);
                 continue;
             }
             i ++;

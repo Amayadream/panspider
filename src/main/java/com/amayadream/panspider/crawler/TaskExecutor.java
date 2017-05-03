@@ -37,7 +37,7 @@ public class TaskExecutor {
         service.execute(hotUkTask);
         Thread.sleep(10000);
         service.execute(fansTask);
-        service.execute(followTask);
+//        service.execute(followTask);
     }
 
 }

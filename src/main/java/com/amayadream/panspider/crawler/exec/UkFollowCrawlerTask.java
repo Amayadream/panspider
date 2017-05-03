@@ -30,7 +30,7 @@ public class UkFollowCrawlerTask implements Runnable {
     public void run() {
         try {
             String uk = null;
-            while ((uk = storage.get(jedis)) != null) {
+            while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FOLLOW_LIST)) != null) {
                 getFollow(jedis, storage, uk);
             }
         } catch (InterruptedException e) {
@@ -51,7 +51,7 @@ public class UkFollowCrawlerTask implements Runnable {
             String result = HttpClientUtils.getRequest(url);
             if (result == null) {
                 logger.warn("[follow]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
-                Thread.sleep(1000);
+                Thread.sleep(Constants.THREAD_SLEEP_ERROR);
                 continue;
             }
             JSONObject o = JSON.parseObject(result);
@@ -64,12 +64,12 @@ public class UkFollowCrawlerTask implements Runnable {
                         storage.product(jedis, u.getString("follow_uk"));
                     });
                     //成功后休眠2s
-                    Thread.sleep(2000);
+                    Thread.sleep(Constants.THREAD_SLEEP_COMMON);
                 } else
                     break;
             } else {
                 logger.warn("[follow]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
-                Thread.sleep(2000);
+                Thread.sleep(Constants.THREAD_SLEEP_ERROR);
                 continue;
             }
             i ++;
