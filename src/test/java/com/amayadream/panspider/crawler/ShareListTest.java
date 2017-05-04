@@ -11,7 +11,7 @@ import org.apache.http.Header;
 public class ShareListTest {
 
     public static void main(String[] args) {
-        String follow_list_url = "http://pan.baidu.com/pcloud/feed/getsharelist?auth_type=1&request_location=share_home&start=0&limit=60&query_uk=224534490";
+        String follow_list_url = "http://exec.baidu.com/pcloud/feed/getsharelist?auth_type=1&request_location=share_home&start=0&limit=60&query_uk=224534490";
         String result = HttpClientUtils.getRequest(follow_list_url, new Header[]{Constants.HTTP_HEADER_REFERER});
         System.out.println(result);
     }

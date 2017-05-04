@@ -26,7 +26,7 @@ public class HttpClientUtils {
 
     private static Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
 
-    private static  Header[] HTTP_COMMON_HEADER = {
+    public static  Header[] HTTP_COMMON_HEADER = {
             new BasicHeader(HttpHeaders.ACCEPT, "*/*"),
             new BasicHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"),
             new BasicHeader(HttpHeaders.CONNECTION, "keep-alive"),
