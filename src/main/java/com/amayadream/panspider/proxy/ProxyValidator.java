@@ -27,7 +27,7 @@ public class ProxyValidator implements Runnable {
     private String host;
     private Integer port;
 
-    public ProxyValidator(Jedis jedis, String host, Integer port) {
+    ProxyValidator(Jedis jedis, String host, Integer port) {
         this.jedis = jedis;
         this.host = host;
         this.port = port;

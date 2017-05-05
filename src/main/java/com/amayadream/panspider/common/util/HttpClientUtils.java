@@ -1,19 +1,16 @@
 package com.amayadream.panspider.common.util;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
@@ -26,7 +23,7 @@ public class HttpClientUtils {
 
     private static Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
 
-    public static  Header[] HTTP_COMMON_HEADER = {
+    public static Header[] HTTP_COMMON_HEADER = {
             new BasicHeader(HttpHeaders.ACCEPT, "*/*"),
             new BasicHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"),
             new BasicHeader(HttpHeaders.CONNECTION, "keep-alive"),
@@ -41,13 +38,32 @@ public class HttpClientUtils {
             .build();
 
     public static String getRequest(String url){
-        return getRequest(url, null);
+        return getRequest(url, null, null);
     }
 
     public static String getRequest(String url, Header[] headers) {
+        return getRequest(url, headers, null);
+    }
+
+    public static String getRequest(String url, String[] ipAndPort) {
+        return getRequest(url, null, ipAndPort);
+    }
+
+    public static String getRequest(String url, Header[] headers, String[] ipAndPort) {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(url);
-        get.setConfig(HTTP_REQUEST_CONFIG);
+        if (!StringUtils.isEmpty(ipAndPort)) {
+            HttpHost proxy = new HttpHost(ipAndPort[0], Integer.valueOf(ipAndPort[1]));
+            RequestConfig config = RequestConfig.custom()
+                    .setConnectTimeout(5000)
+                    .setSocketTimeout(5000)
+                    .setConnectionRequestTimeout(5000)
+                    .setProxy(proxy)
+                    .build();
+            get.setConfig(config);
+        }else {
+            get.setConfig(HTTP_REQUEST_CONFIG);
+        }
         get.setHeaders(HTTP_COMMON_HEADER);
         if (headers != null && headers.length > 0) {
             get.setHeaders(ArrayUtils.addAll(HTTP_COMMON_HEADER, headers));

@@ -20,16 +20,6 @@ import java.util.concurrent.Executors;
  */
 public class SimpleRedisTest extends AbstractSpringTest {
 
-    @Resource
-    private RedisManager redisManager;
-
-    private Jedis jedis;
-
-    @Before
-    public void before() {
-        jedis = redisManager.initResource();
-    }
-
     @Test
     public void test1() {
         jedis.rpush(Constants.REDIS_KEY_UK_LIST, "Java");
@@ -65,11 +55,6 @@ public class SimpleRedisTest extends AbstractSpringTest {
 //        service.execute(hotUkTask);
 //        service.execute(fansTask);
         service.execute(followTask);
-    }
-
-    @After
-    public void after() {
-        redisManager.releaseResource(jedis);
     }
 
 }

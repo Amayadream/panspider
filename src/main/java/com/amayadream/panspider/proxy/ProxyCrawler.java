@@ -36,6 +36,7 @@ public class ProxyCrawler implements Runnable {
                         String[] ipAndHost = proxyIp.split(":");
                         ProxyValidator validator = new ProxyValidator(jedis, ipAndHost[0], Integer.valueOf(ipAndHost[1]));
                         validatorService.execute(validator);
+                        logger.info("正在验证{}:{}", ipAndHost[0], ipAndHost[1]);
                     }
                 }
             }
