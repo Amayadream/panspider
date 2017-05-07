@@ -58,10 +58,10 @@ public class ProxyValidator implements Runnable {
         HttpResponse response;
         try {
             response = client.execute(get);
-            logger.info("代理地址{}:{}验证成功!", host, port);
+            logger.info("代理地址{}:{}验证成功, 已录入代理库!", host, port);
             return response.getStatusLine().getStatusCode() == 200;
         } catch (IOException e) {
-            logger.error("代理地址{}:{}验证失败!", host, port);
+            logger.error("代理地址{}:{}验证失败, 已经丢弃!", host, port);
             return false;
         }
     }

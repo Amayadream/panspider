@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 代理ip抓取类, 负责抓取代理ip
@@ -28,6 +30,8 @@ public class ProxyCrawler implements Runnable {
     @Override
     public void run() {
         while (true) {
+            //1.西刺
+            logger.info("开始进行XiCi代理获取");
             String res = HttpClientUtils.getRequest(Constants.PROXY_URL_XICI);
             if (res != null) {
                 String[] proxyIps = res.split("\r\n");
@@ -40,7 +44,25 @@ public class ProxyCrawler implements Runnable {
                     }
                 }
             }
+            //2.66ip
+            logger.info("开始进行66ip代理获取");
+            res = HttpClientUtils.getRequest(Constants.PROXY_URL_66IP);
+            if (res != null) {
+                Pattern p = Pattern.compile("((\\d+\\.){3}\\d+):(\\d+)");
+                Matcher m = p.matcher(res);
+                while(m.find()) {
+                    ProxyValidator validator = new ProxyValidator(jedis, m.group(1), Integer.valueOf(m.group(3)));
+                    validatorService.execute(validator);
+                    logger.info("正在验证{}:{}", m.group(1), Integer.valueOf(m.group(3)));
+                }
+            }
+
+            //3.验证库中的代理有效性
+            //TODO
+
+            //4.休眠五分钟
             try {
+                logger.info("获取代理结束, 线程暂时休眠");
                 Thread.sleep(300000);
             } catch (InterruptedException e) {
                 e.printStackTrace();

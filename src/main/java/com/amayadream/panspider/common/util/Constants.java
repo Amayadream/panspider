@@ -29,7 +29,7 @@ public class Constants {
     public static final String REDIS_KEY_UK_EXIST_FOLLOW_LIST = "uk_exist_follow_list";
     public static final String REDIS_KEY_UK_EXIST_FANS_LIST = "uk_exist_fans_list";
 
-    public static final String REDIS_KEY_PROXY_IP = "proxy_ip";
+    public static final String REDIS_KEY_PROXY_IP = "proxy_ip_list";
 
 
     public static final Long THREAD_SLEEP_HOT_COMMON = 500L;
@@ -41,7 +41,7 @@ public class Constants {
 
     /** 代理获取接口 */
     public static final String PROXY_URL_XICI = "http://api.xicidaili.com/free2016.txt";
-    public static final String PROXY_URL_66IP = "http://www.66ip.cn/nmtq.php?getnum=10&isp=0&anonymoustype=0&start=&ports=&export=&ipaddress=&area=0&proxytype=2&api=66ip";
+    public static final String PROXY_URL_66IP = "http://www.66ip.cn/nmtq.php?getnum=100&isp=0&anonymoustype=0&start=&ports=&export=&ipaddress=&area=0&proxytype=2&api=66ip";
 
 
 
