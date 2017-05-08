@@ -1,4 +1,4 @@
-package com.amayadream.panspider.proxy;
+package com.amayadream.panspider.crawler.proxy;
 
 import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.common.util.HttpClientUtils;
@@ -36,7 +36,7 @@ public class ProxyValidator implements Runnable {
     @Override
     public void run() {
         if (validateProxyIp(host, port)) {
-            jedis.rpush(Constants.REDIS_KEY_PROXY_IP, host + ":" + port);
+            jedis.sadd(Constants.REDIS_KEY_PROXY_IP, host + ":" + port);
         }
     }
 

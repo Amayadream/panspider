@@ -1,4 +1,4 @@
-package com.amayadream.panspider.proxy;
+package com.amayadream.panspider.crawler.proxy;
 
 import com.amayadream.panspider.AbstractSpringTest;
 import org.junit.Test;

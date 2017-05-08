@@ -1,5 +1,8 @@
 package com.amayadream.panspider.common.util;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
@@ -11,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 
@@ -75,6 +79,63 @@ public class HttpClientUtils {
             if (response.getStatusLine().getStatusCode() == 200) {
                 entity = response.getEntity();
                 return EntityUtils.toString(entity, Constants.CHARSET_UTF8);
+            }
+            logger.warn("请求发生错误, 状态码: {}", response.getStatusLine().getStatusCode());
+            return null;
+        } catch (IOException e) {
+            logger.error("请求失败, 错误原因: {}", e.getMessage());
+            return null;
+        } finally {
+            try {
+                EntityUtils.consume(entity);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String getRequest(String url, Header[] headers, ProxyManager proxyManager, boolean requireSwitch) {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet get = new HttpGet(url);
+        get.setHeaders(HTTP_COMMON_HEADER);
+        if (headers != null && headers.length > 0) {
+            get.setHeaders(ArrayUtils.addAll(HTTP_COMMON_HEADER, headers));
+        }
+        String[] ipAndPort = null;
+        if (requireSwitch) {
+            proxyManager.switchProxy(); //切换代理ip
+        }
+        ipAndPort = proxyManager.getProxy();
+        if (ipAndPort != null) {
+            HttpHost proxy = new HttpHost(ipAndPort[0], Integer.valueOf(ipAndPort[1]));
+            RequestConfig config = RequestConfig.custom()
+                    .setConnectTimeout(5000)
+                    .setSocketTimeout(5000)
+                    .setConnectionRequestTimeout(5000)
+                    .setProxy(proxy)
+                    .build();
+            get.setConfig(config);
+        } else {
+            get.setConfig(HTTP_REQUEST_CONFIG);
+        }
+        HttpResponse response;
+        HttpEntity entity = null;
+        try {
+            response = client.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                entity = response.getEntity();
+                String result = EntityUtils.toString(entity, Constants.CHARSET_UTF8);
+                if (result == null) return null;
+                JSONObject o = JSON.parseObject(result);
+                if (o.getInteger("errno") == 0) {
+                    return result;
+                }
+                else if (o.getInteger("errno") == -55) {
+                    logger.warn("[httpclient]检测到ip被封禁, 正在切换代理ip");
+                    return getRequest(url, headers, proxyManager, true);
+                } else {
+                    return null;
+                }
             }
             logger.warn("请求发生错误, 状态码: {}", response.getStatusLine().getStatusCode());
             return null;

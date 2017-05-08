@@ -1,6 +1,7 @@
 package com.amayadream.panspider.crawler;
 
 import com.amayadream.panspider.crawler.exec.*;
+import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -25,19 +26,21 @@ public class TaskExecutor {
         Jedis jedis1 = pool.getResource();
         Jedis jedis2 = pool.getResource();
         Jedis jedis3 = pool.getResource();
+        Jedis jedis4 = pool.getResource();
 
         UkStorage storage = new UkStorage();
+        ProxyManager proxyManager = ProxyManager.getInstance(jedis4);
 
         ExecutorService service = Executors.newCachedThreadPool();
 
         HotUkCrawlerTask hotUkTask = new HotUkCrawlerTask(jedis1, storage);
-        UkFansCrawlerTask fansTask = new UkFansCrawlerTask(jedis2, storage);
-        UkFollowCrawlerTask followTask = new UkFollowCrawlerTask(jedis3, storage);
+        UkFansCrawlerTask fansTask = new UkFansCrawlerTask(jedis2, storage, proxyManager);
+        UkFollowCrawlerTask followTask = new UkFollowCrawlerTask(jedis3, storage, proxyManager);
 
         service.execute(hotUkTask);
         Thread.sleep(10000);
         service.execute(fansTask);
-//        service.execute(followTask);
+        service.execute(followTask);
     }
 
 }

@@ -42,19 +42,5 @@ public class SimpleRedisTest extends AbstractSpringTest {
 
     }
 
-    @Test
-    public void set() {
-        UkStorage storage = new UkStorage();
-
-        ExecutorService service = Executors.newCachedThreadPool();
-
-//        HotUkCrawlerTask hotUkTask = new HotUkCrawlerTask(jedis, storage);
-//        UkFansCrawlerTask fansTask = new UkFansCrawlerTask(jedis, storage);
-        UkFollowCrawlerTask followTask = new UkFollowCrawlerTask(jedis, storage);
-
-//        service.execute(hotUkTask);
-//        service.execute(fansTask);
-        service.execute(followTask);
-    }
 
 }

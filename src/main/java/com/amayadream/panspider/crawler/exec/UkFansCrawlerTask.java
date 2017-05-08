@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.common.util.HttpClientUtils;
+import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -20,10 +21,12 @@ public class UkFansCrawlerTask implements Runnable {
 
     private Jedis jedis;
     private UkStorage storage;
+    private ProxyManager proxyManager;
 
-    public UkFansCrawlerTask(Jedis jedis, UkStorage storage) {
+    public UkFansCrawlerTask(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
+        this.proxyManager = proxyManager;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class UkFansCrawlerTask implements Runnable {
         String url;
         while (true) {
             url = Constants.URL_FANS.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
-            String result = HttpClientUtils.getRequest(url);
+            String result = HttpClientUtils.getRequest(url, null, proxyManager, false);
             if (result == null) {
                 logger.warn("[fans]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
                 Thread.sleep(Constants.THREAD_SLEEP_ERROR);
@@ -67,6 +70,11 @@ public class UkFansCrawlerTask implements Runnable {
                     Thread.sleep(Constants.THREAD_SLEEP_COMMON);
                 } else
                     break;
+            } else if (o.getInteger("errno") == -55){
+                logger.warn("[fans]uk{} 第{}页爬取失败, 已经被封ip, 等待更换代理", uk, i);
+
+                //TODO 使用/更换代理
+                continue;
             } else {
                 logger.warn("[fans]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
                 Thread.sleep(Constants.THREAD_SLEEP_ERROR);

@@ -1,4 +1,4 @@
-package com.amayadream.panspider.proxy;
+package com.amayadream.panspider.crawler.proxy;
 
 import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.common.util.HttpClientUtils;
@@ -56,11 +56,7 @@ public class ProxyCrawler implements Runnable {
                     logger.info("正在验证{}:{}", m.group(1), Integer.valueOf(m.group(3)));
                 }
             }
-
-            //3.验证库中的代理有效性
-            //TODO
-
-            //4.休眠五分钟
+            //3.休眠五分钟
             try {
                 logger.info("获取代理结束, 线程暂时休眠");
                 Thread.sleep(300000);
