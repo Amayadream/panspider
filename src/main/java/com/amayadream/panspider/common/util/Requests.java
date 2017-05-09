@@ -59,7 +59,7 @@ public class Requests {
 
     private final static Object syncLock = new Object();
 
-    private static Header[] HTTP_COMMON_HEADER = {
+    public static Header[] HTTP_COMMON_HEADER = {
             new BasicHeader(HttpHeaders.ACCEPT, "*/*"),
             new BasicHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36"),
             new BasicHeader(HttpHeaders.CONNECTION, "keep-alive"),
@@ -160,6 +160,10 @@ public class Requests {
         return null;
     }
 
+    public static String getRequest(String url) {
+        return getRequest(url, null, null);
+    }
+
     /**
      * get请求
      * @param url           请求地址
@@ -179,12 +183,14 @@ public class Requests {
      */
     public static String getRequest(String url, ProxyManager proxyManager, Header header) {
         HttpGet httpGet = new HttpGet(url);
-        String[] ipAndPort = proxyManager.getProxy();
-        if (ipAndPort != null)
-            setRequestConfig(httpGet, new HttpHost(ipAndPort[0], Integer.valueOf(ipAndPort[1])));
+        setRequestConfig(httpGet, proxyManager);
         if (header != null)
             httpGet.setHeaders(ArrayUtils.add(HTTP_COMMON_HEADER, header));
         return execute(httpGet, proxyManager, url);
+    }
+
+    public static String postRequest(String url, Map<String, Object> params) {
+        return postRequest(url, params, null, null);
     }
 
     /**
@@ -208,8 +214,7 @@ public class Requests {
      */
     public static String postRequest(String url, Map<String, Object> params, ProxyManager proxyManager, Header header) {
         HttpPost httpPost = new HttpPost(url);
-        String[] ipAndPort = proxyManager.getProxy();
-        setRequestConfig(httpPost, new HttpHost(ipAndPort[0], Integer.valueOf(ipAndPort[1])));
+        setRequestConfig(httpPost, proxyManager);
         setPostParams(httpPost, params);
         if (header != null)
             httpPost.setHeaders(ArrayUtils.add(HTTP_COMMON_HEADER, header));
@@ -256,15 +261,18 @@ public class Requests {
     /**
      * 设置请求参数
      * @param httpRequestBase 请求
-     * @param proxy           代理
+     * @param proxyManager    代理管理器
      */
-    private static void setRequestConfig(HttpRequestBase httpRequestBase, HttpHost proxy) {
+    private static void setRequestConfig(HttpRequestBase httpRequestBase, ProxyManager proxyManager) {
         RequestConfig.Builder builder = RequestConfig.custom()
                 .setConnectionRequestTimeout(timeout)
                 .setConnectTimeout(timeout)
                 .setSocketTimeout(timeout);
-        if (proxy != null)
-            builder.setProxy(proxy);
+        if (proxyManager != null) {
+            String[] ipAndPort = proxyManager.getProxy();
+            if (ipAndPort != null)
+                builder.setProxy(new HttpHost(ipAndPort[0], Integer.valueOf(ipAndPort[1])));
+        }
         httpRequestBase.setConfig(builder.build());
     }
 

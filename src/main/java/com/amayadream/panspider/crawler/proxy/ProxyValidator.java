@@ -1,7 +1,7 @@
 package com.amayadream.panspider.crawler.proxy;
 
 import com.amayadream.panspider.common.util.Constants;
-import com.amayadream.panspider.common.util.HttpClientUtils;
+import com.amayadream.panspider.common.util.Requests;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -54,7 +54,7 @@ public class ProxyValidator implements Runnable {
                 .build();
         HttpGet get = new HttpGet("http://pan.baidu.com/");
         get.setConfig(config);
-        get.setHeaders(HttpClientUtils.HTTP_COMMON_HEADER);
+        get.setHeaders(Requests.HTTP_COMMON_HEADER);
         HttpResponse response;
         try {
             response = client.execute(get);

@@ -1,7 +1,7 @@
 package com.amayadream.panspider.crawler.proxy;
 
 import com.amayadream.panspider.common.util.Constants;
-import com.amayadream.panspider.common.util.HttpClientUtils;
+import com.amayadream.panspider.common.util.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -32,7 +32,7 @@ public class ProxyCrawler implements Runnable {
         while (true) {
             //1.西刺
             logger.info("开始进行XiCi代理获取");
-            String res = HttpClientUtils.getRequest(Constants.PROXY_URL_XICI);
+            String res = Requests.getRequest(Constants.PROXY_URL_XICI);
             if (res != null) {
                 String[] proxyIps = res.split("\r\n");
                 if (proxyIps.length > 0) {
@@ -46,7 +46,7 @@ public class ProxyCrawler implements Runnable {
             }
             //2.66ip
             logger.info("开始进行66ip代理获取");
-            res = HttpClientUtils.getRequest(Constants.PROXY_URL_66IP);
+            res = Requests.getRequest(Constants.PROXY_URL_66IP);
             if (res != null) {
                 Pattern p = Pattern.compile("((\\d+\\.){3}\\d+):(\\d+)");
                 Matcher m = p.matcher(res);
