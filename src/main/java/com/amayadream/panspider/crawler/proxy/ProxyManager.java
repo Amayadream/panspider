@@ -56,9 +56,10 @@ public class ProxyManager {
     }
 
     /**
-     * 删除不可用代理
+     * 删除不可用代理并切换到新的代理
      */
     public void removeProxy(String[] ipAndPort) {
         jedis.srem(Constants.REDIS_KEY_PROXY_IP, ipAndPort[0] + ":" + ipAndPort[1]);
+        switchProxy();
     }
 }

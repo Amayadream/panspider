@@ -3,6 +3,7 @@ package com.amayadream.panspider.common.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -29,6 +30,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -42,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * http请求工具类
  * @author: xjding
  * @date: 2017-05-09 16:36
  */
@@ -113,26 +116,23 @@ public class Requests {
         cm.setMaxPerRoute(new HttpRoute(httpHost), maxRoute);
 
         //请求重试机制
-        HttpRequestRetryHandler retryHandler = new HttpRequestRetryHandler() {
-            @Override
-            public boolean retryRequest(IOException e, int i, HttpContext httpContext) {
-                if (i >= retry)
-                    return false;
-                if (e instanceof NoHttpResponseException)   // 如果服务器丢掉了连接, 重试
-                    return true;
-                if (e instanceof SSLHandshakeException)     //SSL握手异常, 放弃
-                    return false;
-                if (e instanceof InterruptedIOException)    //超时
-                    return false;
-                if (e instanceof UnknownHostException)      // 目标服务器不可达
-                    return false;
-                if (e instanceof SSLException) // SSL异常
-                    return false;
-                HttpClientContext ctx = HttpClientContext.adapt(httpContext);
-                HttpRequest request = ctx.getRequest();
-                //如果请求是幂等的, 就再次尝试
-                return !(request instanceof HttpEntityEnclosingRequest);
-            }
+        HttpRequestRetryHandler retryHandler = (e, i, httpContext) -> {
+            if (i >= retry)
+                return false;
+            if (e instanceof NoHttpResponseException)   // 如果服务器丢掉了连接, 重试
+                return true;
+            if (e instanceof SSLHandshakeException)     //SSL握手异常, 放弃
+                return false;
+            if (e instanceof InterruptedIOException)    //超时
+                return false;
+            if (e instanceof UnknownHostException)      // 目标服务器不可达
+                return false;
+            if (e instanceof SSLException) // SSL异常
+                return false;
+            HttpClientContext ctx = HttpClientContext.adapt(httpContext);
+            HttpRequest request = ctx.getRequest();
+            //如果请求是幂等的, 就再次尝试
+            return !(request instanceof HttpEntityEnclosingRequest);
         };
 
         return HttpClients.custom()
@@ -150,61 +150,70 @@ public class Requests {
         if (result == null) return null;
         if (result.contains("\"errno\":-55"))
             throw new Exception("ip is forbidden!");
-        JSONObject o = JSON.parseObject(result);
-        String list = o.getString(listKey);
-        if (list != null) {
-            return JSONArray.parseArray(list);
+        if (result.contains("\"errno\":0")) {
+            JSONObject o = JSON.parseObject(result);
+            String list = o.getString(listKey);
+            if (list != null) {
+                return JSONArray.parseArray(list);
+            }
         }
         return null;
     }
 
     /**
      * get请求
-     * @param url       请求地址
-     * @return String类型的返回值
+     * @param url           请求地址
+     * @param proxyManager  代理管理
+     * @return  String类型的返回值
      */
-    public static String getRequest(String url) {
-        return getRequest(url, null);
+    public static String getRequest(String url, ProxyManager proxyManager) {
+        return getRequest(url, proxyManager, null);
     }
 
     /**
      * get请求
-     * @param url       请求地址
-     * @param header    http请求头
-     * @return String类型的返回值
+     * @param url           请求地址
+     * @param proxyManager  代理管理
+     * @param header        http请求头
+     * @return  String类型的返回值
      */
-    public static String getRequest(String url, Header header) {
+    public static String getRequest(String url, ProxyManager proxyManager, Header header) {
         HttpGet httpGet = new HttpGet(url);
-        setRequestConfig(httpGet);
+        String[] ipAndPort = proxyManager.getProxy();
+        if (ipAndPort != null)
+            setRequestConfig(httpGet, new HttpHost(ipAndPort[0], Integer.valueOf(ipAndPort[1])));
         if (header != null)
             httpGet.setHeaders(ArrayUtils.add(HTTP_COMMON_HEADER, header));
-        return execute(httpGet, url);
+        return execute(httpGet, proxyManager, url);
     }
 
     /**
      * post请求
-     * @param url       请求地址
-     * @param params    map形式的请求参数
+     * @param url           请求地址
+     * @param params        map形式的请求参数
+     * @param proxyManager  代理管理
      * @return String类型的返回值
      */
-    public static String postRequest(String url, Map<String, Object> params) {
-        return postRequest(url, params, null);
+    public static String postRequest(String url, Map<String, Object> params, ProxyManager proxyManager) {
+        return postRequest(url, params, proxyManager, null);
     }
 
     /**
      * post请求
-     * @param url       请求地址
-     * @param params    map形式的请求参数
-     * @param header    http头
+     * @param url           请求地址
+     * @param params        map形式的请求参数
+     * @param proxyManager  代理管理
+     * @param header        http头
      * @return String类型的返回值
      */
-    public static String postRequest(String url, Map<String, Object> params, Header header) {
+    public static String postRequest(String url, Map<String, Object> params, ProxyManager proxyManager, Header header) {
         HttpPost httpPost = new HttpPost(url);
-        setRequestConfig(httpPost);
+        String[] ipAndPort = proxyManager.getProxy();
+        setRequestConfig(httpPost, new HttpHost(ipAndPort[0], Integer.valueOf(ipAndPort[1])));
         setPostParams(httpPost, params);
         if (header != null)
             httpPost.setHeaders(ArrayUtils.add(HTTP_COMMON_HEADER, header));
-        return execute(httpPost, url);
+        return execute(httpPost, proxyManager, url);
     }
 
     /**
@@ -213,7 +222,7 @@ public class Requests {
      * @param url               请求地址
      * @return String类型的返回值
      */
-    private static String execute(HttpRequestBase httpRequestBase, String url) {
+    private static String execute(HttpRequestBase httpRequestBase, ProxyManager proxyManager, String url) {
         CloseableHttpResponse response = null;
         try {
             response = getHttpClient(url).execute(httpRequestBase, HttpClientContext.create());
@@ -226,7 +235,13 @@ public class Requests {
             }
             logger.warn("[requests]请求错误, 状态码: " + response.getStatusLine().getStatusCode());
         } catch (IOException e) {
-            logger.error("[requests]执行请求中出错, 错误原因: " + e.getMessage());
+            //有代理的情况下连接异常, 则移除并切换代理
+            if ((e.getMessage().contains("connect timed out") || e.getMessage().contains("Read timed out")) && proxyManager.getProxy() != null) {
+                logger.error("[requests]执行请求超时, 正在切换代理并删除当前代理");
+                proxyManager.removeProxy(proxyManager.getProxy());
+            } else {
+                logger.error("[requests]执行请求中出错, 错误原因: " + e.getMessage());
+            }
         } finally {
             try {
                 if (response != null)
@@ -236,14 +251,6 @@ public class Requests {
             }
         }
         return null;
-    }
-
-    /**
-     * 设置请求参数
-     * @param httpRequestBase 请求
-     */
-    private static void setRequestConfig(HttpRequestBase httpRequestBase) {
-        setRequestConfig(httpRequestBase, null);
     }
 
     /**

@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.common.util.HttpClientUtils;
+import com.amayadream.panspider.common.util.Requests;
+import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -20,10 +22,12 @@ public class HotUkCrawlerTask implements Runnable {
 
     private Jedis jedis;
     private UkStorage storage;
+    private ProxyManager proxyManager;
 
-    public HotUkCrawlerTask(Jedis jedis, UkStorage storage) {
+    public HotUkCrawlerTask(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
+        this.proxyManager = proxyManager;
     }
 
     /**
@@ -46,32 +50,31 @@ public class HotUkCrawlerTask implements Runnable {
 
         int i = 0;
         String url;
+
         while (true) {
             url = Constants.URL_HOT_UK.replace("{start}", String.valueOf(i));
-            String result = HttpClientUtils.getRequest(url);
-            if (result == null) {
-                logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
-                Thread.sleep(Constants.THREAD_SLEEP_HOT_ERROR);
-                continue;
-            }
-            JSONObject o = JSON.parseObject(result);
-            if (o.getInteger("errno") == 0) {
-                JSONArray arr = JSON.parseArray(o.getString("hotuser_list"));
-                if (arr.size() != 0) {
+            JSONArray result = null;
+            try {
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "hotuser_list");
+                if (result == null) {
+                    logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
+                    continue;
+                }
+                if (result.size() != 0) {
                     logger.info("[hot]正在爬取第{}页数据", i);
-                    arr.forEach(o1 -> {
+                    result.forEach(o1 -> {
                         JSONObject u = JSON.parseObject(String.valueOf(o1));
                         storage.product(jedis, u.getString("hot_uk"));
                     });
-                    //成功后休眠1s
-                    Thread.sleep(Constants.THREAD_SLEEP_HOT_COMMON);
                 } else
                     break;
-            } else {
-                logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
-                Thread.sleep(Constants.THREAD_SLEEP_HOT_ERROR);
+            } catch (Exception e) {
+                //被封禁, 切换代理然后重试
+                logger.warn("[hot]第{}页检测到被封禁ip, 正在尝试切换代理", i);
+                proxyManager.switchProxy();
                 continue;
             }
+
             i ++;
         }
 

@@ -1,7 +1,8 @@
-package com.amayadream.panspider.common.util;
+package com.amayadream.panspider;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.*;
@@ -14,12 +15,11 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 
 /**
- * httpclient工具类
+ * httpclient工具类, 目前提供给test使用
  * @author :  Amayadream
  * @date :  2017.04.19 21:39
  */

@@ -1,6 +1,6 @@
 package com.amayadream.panspider.crawler;
 
-import com.amayadream.panspider.common.util.HttpClientUtils;
+import com.amayadream.panspider.HttpClientUtils;
 
 /**
  * @author: Amayadream

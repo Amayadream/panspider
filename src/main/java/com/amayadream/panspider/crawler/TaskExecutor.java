@@ -36,7 +36,7 @@ public class TaskExecutor {
 
         ExecutorService service = Executors.newCachedThreadPool();
 
-        HotUkCrawlerTask hotUkTask = new HotUkCrawlerTask(jedis1, storage);
+        HotUkCrawlerTask hotUkTask = new HotUkCrawlerTask(jedis1, storage, proxyManager);
         UkFansCrawlerTask fansTask = new UkFansCrawlerTask(jedis2, storage, proxyManager);
         UkFollowCrawlerTask followTask = new UkFollowCrawlerTask(jedis3, storage, proxyManager);
 

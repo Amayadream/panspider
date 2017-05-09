@@ -1,7 +1,7 @@
 package com.amayadream.panspider.crawler;
 
 import com.amayadream.panspider.common.util.Constants;
-import com.amayadream.panspider.common.util.HttpClientUtils;
+import com.amayadream.panspider.HttpClientUtils;
 import org.apache.http.Header;
 
 /**
