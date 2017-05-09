@@ -9,7 +9,7 @@ import com.amayadream.panspider.common.util.Requests;
 public class FansListTest {
 
     public static void main(String[] args) {
-        String url = "http://exec.baidu.com/pcloud/friend/getfanslist?query_uk=%s&limit=24&start=%s";
+        String url = "http://pan.baidu.com/pcloud/friend/getfanslist?query_uk=%s&limit=24&start=%s";
         String result = Requests.getRequest(String.format(url, 892398881, 1));
         System.out.println(result);
     }

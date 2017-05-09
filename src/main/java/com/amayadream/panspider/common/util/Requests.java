@@ -26,11 +26,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -241,7 +239,9 @@ public class Requests {
             logger.warn("[requests]请求错误, 状态码: " + response.getStatusLine().getStatusCode());
         } catch (IOException e) {
             //有代理的情况下连接异常, 则移除并切换代理
-            if ((e.getMessage().contains("connect timed out") || e.getMessage().contains("Read timed out")) && proxyManager.getProxy() != null) {
+            if (e.getMessage() != null
+                    && (e.getMessage().contains("connect timed out") || e.getMessage().contains("Read timed out"))
+                    && proxyManager.getProxy() != null) {
                 logger.error("[requests]执行请求超时, 正在切换代理并删除当前代理");
                 proxyManager.removeProxy(proxyManager.getProxy());
             } else {
