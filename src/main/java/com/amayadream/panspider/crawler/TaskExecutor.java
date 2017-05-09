@@ -1,6 +1,9 @@
 package com.amayadream.panspider.crawler;
 
-import com.amayadream.panspider.crawler.exec.*;
+import com.amayadream.panspider.crawler.exec.HotUkCrawlerTask;
+import com.amayadream.panspider.crawler.exec.UkFansCrawlerTask;
+import com.amayadream.panspider.crawler.exec.UkFollowCrawlerTask;
+import com.amayadream.panspider.crawler.exec.UkStorage;
 import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
