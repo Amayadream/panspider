@@ -20,10 +20,10 @@ public class FollowCrawler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(FollowCrawler.class);
 
     private Jedis jedis;
-    private UkStorage storage;
+    private Storage storage;
     private ProxyManager proxyManager;
 
-    public FollowCrawler(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
+    public FollowCrawler(Jedis jedis, Storage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
         this.proxyManager = proxyManager;
@@ -31,20 +31,16 @@ public class FollowCrawler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            String uk;
-            while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FOLLOW_LIST)) != null) {
-                getFollow(jedis, storage, uk);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        String uk;
+        while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FOLLOW_LIST)) != null) {
+            getFollow(jedis, storage, uk);
         }
     }
 
     /**
      * 根据uk获取到其所有订阅
      */
-    public void getFollow(Jedis jedis, UkStorage storage, String uk) throws InterruptedException {
+    private void getFollow(Jedis jedis, Storage storage, String uk) {
         logger.info("[follow]uk{} 订阅uk爬取任务开始", uk);
 
         Integer i = 0;

@@ -20,10 +20,10 @@ public class FansCrawler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(FansCrawler.class);
 
     private Jedis jedis;
-    private UkStorage storage;
+    private Storage storage;
     private ProxyManager proxyManager;
 
-    public FansCrawler(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
+    public FansCrawler(Jedis jedis, Storage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
         this.proxyManager = proxyManager;
@@ -31,20 +31,16 @@ public class FansCrawler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            String uk;
-            while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FANS_LIST)) != null) {
-                getFans(jedis, storage, uk);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        String uk;
+        while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FANS_LIST)) != null) {
+            getFans(jedis, storage, uk);
         }
     }
 
     /**
      * 根据uk获取到其所有粉丝的uk
      */
-    public void getFans(Jedis jedis, UkStorage storage, String uk) throws InterruptedException {
+    private void getFans(Jedis jedis, Storage storage, String uk) {
         logger.info("[fans]uk{} 粉丝uk爬取任务开始", uk);
 
         Integer i = 0;

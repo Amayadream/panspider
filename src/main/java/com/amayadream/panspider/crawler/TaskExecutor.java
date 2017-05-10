@@ -3,7 +3,7 @@ package com.amayadream.panspider.crawler;
 import com.amayadream.panspider.crawler.exec.UkCrawler;
 import com.amayadream.panspider.crawler.exec.FansCrawler;
 import com.amayadream.panspider.crawler.exec.FollowCrawler;
-import com.amayadream.panspider.crawler.exec.UkStorage;
+import com.amayadream.panspider.crawler.exec.Storage;
 import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -31,7 +31,7 @@ public class TaskExecutor {
         Jedis jedis3 = pool.getResource();
         Jedis jedis4 = pool.getResource();
 
-        UkStorage storage = new UkStorage();
+        Storage storage = new Storage();
         ProxyManager proxyManager = ProxyManager.getInstance(jedis4);
 
         ExecutorService service = Executors.newCachedThreadPool();

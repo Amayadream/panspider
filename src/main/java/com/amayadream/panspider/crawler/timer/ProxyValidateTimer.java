@@ -28,13 +28,13 @@ public class ProxyValidateTimer {
     public void validate() {
         Jedis jedis = redisManager.initResource();
         try {
-            Set<String> set = jedis.smembers(Constants.REDIS_KEY_PROXY_IP);
+            Set<String> set = jedis.smembers(Constants.REDIS_KEY_PROXY_IP_SET);
             if (set == null || set.size() == 0) return;
             set.forEach(
                 item -> {
                     String[] ipAndPort = item.split(":");
                     if (!ProxyValidator.validateProxyIp(ipAndPort[0], Integer.valueOf(ipAndPort[1]))) {
-                        jedis.srem(Constants.REDIS_KEY_PROXY_IP, item);
+                        jedis.srem(Constants.REDIS_KEY_PROXY_IP_SET, item);
                     }
                 }
             );

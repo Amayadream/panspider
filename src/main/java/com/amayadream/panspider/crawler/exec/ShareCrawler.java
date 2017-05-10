@@ -1,8 +1,6 @@
 package com.amayadream.panspider.crawler.exec;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.common.util.Requests;
 import com.amayadream.panspider.crawler.proxy.ProxyManager;
@@ -19,10 +17,10 @@ public class ShareCrawler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(ShareCrawler.class);
 
     private Jedis jedis;
-    private UkStorage storage;
+    private Storage storage;
     private ProxyManager proxyManager;
 
-    public ShareCrawler(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
+    public ShareCrawler(Jedis jedis, Storage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
         this.proxyManager = proxyManager;
@@ -30,20 +28,16 @@ public class ShareCrawler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            String uk;
-            while ((uk = storage.consume(jedis)) != null) {
-                getFollow(jedis, storage, uk);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        String uk;
+        while ((uk = storage.consume(jedis)) != null) {
+            getFollow(jedis, storage, uk);
         }
     }
 
     /**
      * 根据uk获取到其所有订阅
      */
-    public void getFollow(Jedis jedis, UkStorage storage, String uk) throws InterruptedException {
+    public void getFollow(Jedis jedis, Storage storage, String uk) {
         logger.info("[share]uk{} uk共享文件爬取任务开始", uk);
 
         Integer i = 0;
@@ -52,17 +46,14 @@ public class ShareCrawler implements Runnable {
             url = Constants.URL_SHARE.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
             JSONArray result = null;
             try {
-                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "records");
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager, Constants.HTTP_HEADER_REFERER), "records");
                 if (result == null) {
                     logger.warn("[share]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
                     continue;
                 }
                 if (result.size() != 0) {
                     logger.info("[share]uk{} 正在爬取第{}页数据", uk, i);
-                    result.forEach(o1 -> {
-                        JSONObject u = JSON.parseObject(String.valueOf(o1));
-                        //TODO 处理
-                    });
+                    result.forEach(o1 -> storage.saveShare(jedis, String.valueOf(o1)));
                 } else
                     break;
             } catch (Exception e) {

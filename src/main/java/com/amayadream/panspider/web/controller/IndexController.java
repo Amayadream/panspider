@@ -1,7 +1,12 @@
 package com.amayadream.panspider.web.controller;
 
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.annotation.Resource;
 
 /**
  * @author :  Amayadream
@@ -10,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping(value = "/")
 public class IndexController {
+
+    @Resource
+    private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "")
     public String redirect() {
@@ -20,5 +28,18 @@ public class IndexController {
     public String index() {
         return "index";
     }
+
+    @RequestMapping(value = "/search")
+    public String search(@RequestParam String q) {
+
+        return null;
+    }
+
+    @RequestMapping(value = "/share/{shareId}")
+    public String result(@PathVariable String shareId) {
+
+        return null;
+    }
+
 
 }

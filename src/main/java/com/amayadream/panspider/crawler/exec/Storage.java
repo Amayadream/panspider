@@ -10,7 +10,7 @@ import java.util.Set;
  * @author : Amayadream
  * @date : 2017-04-27 09:25
  */
-public class UkStorage {
+public class Storage {
 
     /**
      * 生产单条uk
@@ -68,6 +68,20 @@ public class UkStorage {
             //如果已经处理过则重复这次操作
             return consume(jedis);
         }
+    }
+
+    /**
+     * 消费一条share记录
+     */
+    public synchronized String getShare(Jedis jedis) {
+        return jedis.blpop(0, Constants.REDIS_KEY_SHARE_LIST).get(1);
+    }
+
+    /**
+     * 生产一条share记录
+     */
+    public synchronized void saveShare(Jedis jedis, String share) {
+        jedis.rpush(Constants.REDIS_KEY_SHARE_LIST, share);
     }
 
 }

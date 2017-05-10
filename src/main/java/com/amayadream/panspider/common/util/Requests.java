@@ -150,9 +150,9 @@ public class Requests {
             throw new Exception("ip is forbidden!");
         if (result.contains("\"errno\":0")) {
             JSONObject o = JSON.parseObject(result);
-            String list = o.getString(listKey);
-            if (list != null) {
-                return JSONArray.parseArray(list);
+            JSONArray array = o.getJSONArray(listKey);
+            if (array != null) {
+                return array;
             }
         }
         return null;

@@ -41,9 +41,20 @@ public class Share {
     private String avatar;
 
 
-    public Share() {
-
+    public Share(String shareId, String shortId, String title, String desc, long feedTime, int category, int fileCount, int dirCount, String uk, String userName, String avatar) {
+        this.shareId = shareId;
+        this.shortId = shortId;
+        this.title = title;
+        this.desc = desc;
+        this.feedTime = feedTime;
+        this.category = category;
+        this.fileCount = fileCount;
+        this.dirCount = dirCount;
+        this.uk = uk;
+        this.userName = userName;
+        this.avatar = avatar;
     }
+
 
     public String getShareId() {
         return shareId;

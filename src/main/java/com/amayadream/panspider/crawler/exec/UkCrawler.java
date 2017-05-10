@@ -20,10 +20,10 @@ public class UkCrawler implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(UkCrawler.class);
 
     private Jedis jedis;
-    private UkStorage storage;
+    private Storage storage;
     private ProxyManager proxyManager;
 
-    public UkCrawler(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
+    public UkCrawler(Jedis jedis, Storage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
         this.proxyManager = proxyManager;
@@ -34,17 +34,13 @@ public class UkCrawler implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            getHotUk(jedis, storage);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        getHotUk(jedis, storage);
     }
 
     /**
      * 获取热门用户并补充到uk_list中
      */
-    public void getHotUk(Jedis jedis, UkStorage storage) throws InterruptedException {
+    private void getHotUk(Jedis jedis, Storage storage) {
         logger.info("[hot]热门uk爬取任务开始");
 
         int i = 0;

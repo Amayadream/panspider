@@ -29,15 +29,9 @@ public class Constants {
     /** 存储等待爬取粉丝和订阅的uk list */
     public static final String REDIS_KEY_UK_EXIST_FOLLOW_LIST = "uk_exist_follow_list";
     public static final String REDIS_KEY_UK_EXIST_FANS_LIST = "uk_exist_fans_list";
-
-    public static final String REDIS_KEY_PROXY_IP = "proxy_ip_set";
-
-
-    public static final Long THREAD_SLEEP_HOT_COMMON = 500L;
-    public static final Long THREAD_SLEEP_HOT_ERROR = 500L;
-
-    public static final Long THREAD_SLEEP_COMMON = 500L;
-    public static final Long THREAD_SLEEP_ERROR = 500L;
+    /** 存储代理库的set */
+    public static final String REDIS_KEY_PROXY_IP_SET = "proxy_ip_set";
+    public static final String REDIS_KEY_SHARE_LIST = "share_list";
 
 
     /** 代理获取接口 */

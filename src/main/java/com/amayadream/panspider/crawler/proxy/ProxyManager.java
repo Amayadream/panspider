@@ -43,7 +43,7 @@ public class ProxyManager {
      * 切换代理
      */
     public synchronized void switchProxy() {
-        String proxy = jedis.srandmember(Constants.REDIS_KEY_PROXY_IP);
+        String proxy = jedis.srandmember(Constants.REDIS_KEY_PROXY_IP_SET);
         if (proxy == null) {
             logger.warn("[switchProxy]代理已经消耗完毕, 等待30秒后继续执行!");
             try {
@@ -70,7 +70,7 @@ public class ProxyManager {
      * @param ipAndPort [ip, port]
      */
     public synchronized void removeProxy(String[] ipAndPort) {
-        jedis.srem(Constants.REDIS_KEY_PROXY_IP, ipAndPort[0] + ":" + ipAndPort[1]);
+        jedis.srem(Constants.REDIS_KEY_PROXY_IP_SET, ipAndPort[0] + ":" + ipAndPort[1]);
         logger.info("[removeProxy]成功从代理库中移除代理 {}:{}", ipAndPort[0], ipAndPort[1]);
         switchProxy();
     }
