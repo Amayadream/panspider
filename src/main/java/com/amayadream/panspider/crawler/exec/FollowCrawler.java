@@ -49,7 +49,7 @@ public class FollowCrawler implements Runnable {
             url = Constants.URL_FOLLOW.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
             JSONArray result = null;
             try {
-                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "follow_list");
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager, Constants.HTTP_HEADER_REFERER), "follow_list");
                 if (result == null) {
                     logger.warn("[follow]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
                     continue;

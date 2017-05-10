@@ -49,7 +49,7 @@ public class FansCrawler implements Runnable {
             url = Constants.URL_FANS.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
             JSONArray result = null;
             try {
-                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "fans_list");
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager, Constants.HTTP_HEADER_REFERER), "fans_list");
                 if (result == null) {
                     logger.warn("[fans]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
                     continue;

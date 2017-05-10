@@ -50,7 +50,7 @@ public class UkCrawler implements Runnable {
             url = Constants.URL_HOT_UK.replace("{start}", String.valueOf(i));
             JSONArray result = null;
             try {
-                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "hotuser_list");
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager, Constants.HTTP_HEADER_REFERER), "hotuser_list");
                 if (result == null) {
                     logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
                     continue;

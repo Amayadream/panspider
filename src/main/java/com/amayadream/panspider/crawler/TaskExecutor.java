@@ -1,9 +1,7 @@
 package com.amayadream.panspider.crawler;
 
-import com.amayadream.panspider.crawler.exec.UkCrawler;
-import com.amayadream.panspider.crawler.exec.FansCrawler;
-import com.amayadream.panspider.crawler.exec.FollowCrawler;
-import com.amayadream.panspider.crawler.exec.Storage;
+import com.amayadream.panspider.crawler.exec.*;
+import com.amayadream.panspider.crawler.proxy.ProxyCrawler;
 import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -26,24 +24,32 @@ public class TaskExecutor {
         BeanFactory factory = (BeanFactory) context;
 
         JedisPool pool = factory.getBean(JedisPool.class);
-        Jedis jedis1 = pool.getResource();
-        Jedis jedis2 = pool.getResource();
-        Jedis jedis3 = pool.getResource();
-        Jedis jedis4 = pool.getResource();
+        Jedis jedis = pool.getResource();
 
         Storage storage = new Storage();
-        ProxyManager proxyManager = ProxyManager.getInstance(jedis4);
+        ProxyManager proxyManager = ProxyManager.getInstance(jedis);
 
         ExecutorService service = Executors.newCachedThreadPool();
+        ExecutorService validatorService = Executors.newFixedThreadPool(3);
 
-        UkCrawler hotUkTask = new UkCrawler(jedis1, storage, proxyManager);
-        FansCrawler fansTask = new FansCrawler(jedis2, storage, proxyManager);
-        FollowCrawler followTask = new FollowCrawler(jedis3, storage, proxyManager);
+        ProxyCrawler proxyCrawler = new ProxyCrawler(jedis, validatorService);
+
+        UkCrawler hotUkTask = new UkCrawler(jedis, storage, proxyManager);
+        FansCrawler fansTask = new FansCrawler(jedis, storage, proxyManager);
+        FollowCrawler followTask = new FollowCrawler(jedis, storage, proxyManager);
+
+        ShareCrawler shareCrawler = new ShareCrawler(jedis, storage, proxyManager);
+
+        service.execute(proxyCrawler);
+        Thread.sleep(5000);
 
         service.execute(hotUkTask);
         Thread.sleep(10000);
+
         service.execute(fansTask);
         service.execute(followTask);
+        service.execute(shareCrawler);
+
     }
 
 }

@@ -235,6 +235,8 @@ public class Requests {
                 String result = EntityUtils.toString(entity, "utf-8");
                 EntityUtils.consume(entity);
                 return result;
+            } else if (proxyManager.getProxy() != null) {   //有代理情况下非200则默认为代理异常, 直接移除
+                proxyManager.removeProxy(proxyManager.getProxy());
             }
             logger.warn("[requests]请求错误, 状态码: " + response.getStatusLine().getStatusCode());
         } catch (IOException e) {
@@ -288,7 +290,7 @@ public class Requests {
             pairs.add(new BasicNameValuePair(key, params.get(key).toString()));
         }
         try {
-            httpPost.setEntity(new UrlEncodedFormEntity(pairs, "utf-8"));
+            httpPost.setEntity(new UrlEncodedFormEntity(pairs, Constants.CHARSET_UTF8));
         } catch (UnsupportedEncodingException e) {
             logger.error("[requests]不支持的编码格式!");
         }
