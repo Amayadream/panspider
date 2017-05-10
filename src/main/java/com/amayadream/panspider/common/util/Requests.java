@@ -43,8 +43,8 @@ import java.util.Set;
 
 /**
  * http请求工具类
- * @author: xjding
- * @date: 2017-05-09 16:36
+ * @author : Amayadream
+ * @date : 2017-05-09 16:36
  */
 public class Requests {
 

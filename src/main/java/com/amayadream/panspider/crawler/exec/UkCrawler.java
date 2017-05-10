@@ -11,64 +11,65 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 /**
- * uk粉丝爬取线程
+ * 热门uk爬取线程
  * @author :  Amayadream
- * @date :  2017.05.01 14:43
+ * @date :  2017.05.01 14:42
  */
-public class UkFansCrawlerTask implements Runnable {
+public class UkCrawler implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(UkFansCrawlerTask.class);
+    private static Logger logger = LoggerFactory.getLogger(UkCrawler.class);
 
     private Jedis jedis;
     private UkStorage storage;
     private ProxyManager proxyManager;
 
-    public UkFansCrawlerTask(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
+    public UkCrawler(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
         this.proxyManager = proxyManager;
     }
 
+    /**
+     * 从热门uk接口中获取热门的uk
+     */
     @Override
     public void run() {
         try {
-            String uk = null;
-            while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FANS_LIST)) != null) {
-                getFans(jedis, storage, uk);
-            }
+            getHotUk(jedis, storage);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * 根据uk获取到其所有粉丝的uk
+     * 获取热门用户并补充到uk_list中
      */
-    public void getFans(Jedis jedis, UkStorage storage, String uk) throws InterruptedException {
-        logger.info("[fans]uk{} 粉丝uk爬取任务开始", uk);
+    public void getHotUk(Jedis jedis, UkStorage storage) throws InterruptedException {
+        logger.info("[hot]热门uk爬取任务开始");
 
-        Integer i = 0;
+        int i = 0;
         String url;
+
         while (true) {
-            url = Constants.URL_FANS.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
+            url = Constants.URL_HOT_UK.replace("{start}", String.valueOf(i));
             JSONArray result = null;
             try {
-                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "fans_list");
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "hotuser_list");
                 if (result == null) {
-                    logger.warn("[fans]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
+                    logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
                     continue;
                 }
                 if (result.size() != 0) {
-                    logger.info("[fans]uk{} 正在爬取第{}页数据", uk, i);
+                    logger.info("[hot]正在爬取第{}页数据", i);
                     result.forEach(o1 -> {
                         JSONObject u = JSON.parseObject(String.valueOf(o1));
-                        storage.product(jedis, u.getString("fans_uk"));
+                        storage.product(jedis, u.getString("hot_uk"));
                     });
                 } else
                     break;
             } catch (Exception e) {
                 //被封禁, 切换代理然后重试
-                logger.warn("[fans]uk{} 第{}页检测到被封禁ip, 正在尝试切换代理", uk, i);
+                logger.warn("[hot]第{}页检测到被封禁ip, 正在尝试切换代理", i);
                 proxyManager.switchProxy();
                 continue;
             }
@@ -76,8 +77,7 @@ public class UkFansCrawlerTask implements Runnable {
             i ++;
         }
 
-        logger.info("[fans]uk{} 粉丝uk爬取任务结束", uk);
+        logger.info("[hot]热门uk爬取任务结束");
     }
-
 
 }

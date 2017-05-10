@@ -1,8 +1,8 @@
 package com.amayadream.panspider.crawler;
 
-import com.amayadream.panspider.crawler.exec.HotUkCrawlerTask;
-import com.amayadream.panspider.crawler.exec.UkFansCrawlerTask;
-import com.amayadream.panspider.crawler.exec.UkFollowCrawlerTask;
+import com.amayadream.panspider.crawler.exec.UkCrawler;
+import com.amayadream.panspider.crawler.exec.FansCrawler;
+import com.amayadream.panspider.crawler.exec.FollowCrawler;
 import com.amayadream.panspider.crawler.exec.UkStorage;
 import com.amayadream.panspider.crawler.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
@@ -36,9 +36,9 @@ public class TaskExecutor {
 
         ExecutorService service = Executors.newCachedThreadPool();
 
-        HotUkCrawlerTask hotUkTask = new HotUkCrawlerTask(jedis1, storage, proxyManager);
-        UkFansCrawlerTask fansTask = new UkFansCrawlerTask(jedis2, storage, proxyManager);
-        UkFollowCrawlerTask followTask = new UkFollowCrawlerTask(jedis3, storage, proxyManager);
+        UkCrawler hotUkTask = new UkCrawler(jedis1, storage, proxyManager);
+        FansCrawler fansTask = new FansCrawler(jedis2, storage, proxyManager);
+        FollowCrawler followTask = new FollowCrawler(jedis3, storage, proxyManager);
 
         service.execute(hotUkTask);
         Thread.sleep(10000);

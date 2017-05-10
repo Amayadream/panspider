@@ -11,19 +11,19 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 /**
- * uk订阅爬取线程
+ * uk粉丝爬取线程
  * @author :  Amayadream
  * @date :  2017.05.01 14:43
  */
-public class UkFollowCrawlerTask implements Runnable {
+public class FansCrawler implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(UkFollowCrawlerTask.class);
+    private static Logger logger = LoggerFactory.getLogger(FansCrawler.class);
 
     private Jedis jedis;
     private UkStorage storage;
     private ProxyManager proxyManager;
 
-    public UkFollowCrawlerTask(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
+    public FansCrawler(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
         this.proxyManager = proxyManager;
@@ -32,9 +32,9 @@ public class UkFollowCrawlerTask implements Runnable {
     @Override
     public void run() {
         try {
-            String uk = null;
-            while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FOLLOW_LIST)) != null) {
-                getFollow(jedis, storage, uk);
+            String uk;
+            while ((uk = storage.get(jedis, Constants.REDIS_KEY_UK_EXIST_FANS_LIST)) != null) {
+                getFans(jedis, storage, uk);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -42,33 +42,33 @@ public class UkFollowCrawlerTask implements Runnable {
     }
 
     /**
-     * 根据uk获取到其所有订阅
+     * 根据uk获取到其所有粉丝的uk
      */
-    public void getFollow(Jedis jedis, UkStorage storage, String uk) throws InterruptedException {
-        logger.info("[follow]uk{} 订阅uk爬取任务开始", uk);
+    public void getFans(Jedis jedis, UkStorage storage, String uk) throws InterruptedException {
+        logger.info("[fans]uk{} 粉丝uk爬取任务开始", uk);
 
         Integer i = 0;
         String url;
         while (true) {
-            url = Constants.URL_FOLLOW.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
+            url = Constants.URL_FANS.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
             JSONArray result = null;
             try {
-                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "follow_list");
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "fans_list");
                 if (result == null) {
-                    logger.warn("[follow]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
+                    logger.warn("[fans]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
                     continue;
                 }
                 if (result.size() != 0) {
-                    logger.info("[follow]uk{} 正在爬取第{}页数据", uk, i);
+                    logger.info("[fans]uk{} 正在爬取第{}页数据", uk, i);
                     result.forEach(o1 -> {
                         JSONObject u = JSON.parseObject(String.valueOf(o1));
-                        storage.product(jedis, u.getString("follow_uk"));
+                        storage.product(jedis, u.getString("fans_uk"));
                     });
                 } else
                     break;
             } catch (Exception e) {
                 //被封禁, 切换代理然后重试
-                logger.warn("[follow]uk{} 第{}页检测到被封禁ip, 正在尝试切换代理", uk, i);
+                logger.warn("[fans]uk{} 第{}页检测到被封禁ip, 正在尝试切换代理", uk, i);
                 proxyManager.switchProxy();
                 continue;
             }
@@ -76,7 +76,8 @@ public class UkFollowCrawlerTask implements Runnable {
             i ++;
         }
 
-        logger.info("[follow]uk{} 订阅uk爬取任务结束", uk);
+        logger.info("[fans]uk{} 粉丝uk爬取任务结束", uk);
     }
+
 
 }

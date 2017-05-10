@@ -2,17 +2,7 @@ package com.amayadream.panspider.crawler;
 
 import com.amayadream.panspider.AbstractSpringTest;
 import com.amayadream.panspider.common.util.Constants;
-import com.amayadream.panspider.common.util.RedisManager;
-import com.amayadream.panspider.crawler.exec.UkFollowCrawlerTask;
-import com.amayadream.panspider.crawler.exec.UkStorage;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import redis.clients.jedis.Jedis;
-
-import javax.annotation.Resource;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author :  Amayadream

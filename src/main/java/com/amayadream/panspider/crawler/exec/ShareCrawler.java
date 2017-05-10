@@ -11,65 +11,63 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 /**
- * 热门uk爬取线程
- * @author :  Amayadream
- * @date :  2017.05.01 14:42
+ * @author : Amayadream
+ * @date : 2017-04-27 09:24
  */
-public class HotUkCrawlerTask implements Runnable {
+public class ShareCrawler implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(HotUkCrawlerTask.class);
+    private static Logger logger = LoggerFactory.getLogger(ShareCrawler.class);
 
     private Jedis jedis;
     private UkStorage storage;
     private ProxyManager proxyManager;
 
-    public HotUkCrawlerTask(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
+    public ShareCrawler(Jedis jedis, UkStorage storage, ProxyManager proxyManager) {
         this.jedis = jedis;
         this.storage = storage;
         this.proxyManager = proxyManager;
     }
 
-    /**
-     * 从热门uk接口中获取热门的uk
-     */
     @Override
     public void run() {
         try {
-            getHotUk(jedis, storage);
+            String uk;
+            while ((uk = storage.consume(jedis)) != null) {
+                getFollow(jedis, storage, uk);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * 获取热门用户并补充到uk_list中
+     * 根据uk获取到其所有订阅
      */
-    public void getHotUk(Jedis jedis, UkStorage storage) throws InterruptedException {
-        logger.info("[hot]热门uk爬取任务开始");
+    public void getFollow(Jedis jedis, UkStorage storage, String uk) throws InterruptedException {
+        logger.info("[share]uk{} uk共享文件爬取任务开始", uk);
 
-        int i = 0;
+        Integer i = 0;
         String url;
-
         while (true) {
-            url = Constants.URL_HOT_UK.replace("{start}", String.valueOf(i));
+            url = Constants.URL_SHARE.replace("{start}", String.valueOf(i)).replace("{uk}", uk);
             JSONArray result = null;
             try {
-                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "hotuser_list");
+                result = Requests.parseResult(Requests.getRequest(url, proxyManager), "records");
                 if (result == null) {
-                    logger.warn("[hot]第{}次爬取异常, 暂时休眠后继续", i);
+                    logger.warn("[share]uk{} 第{}页爬取异常, 暂时休眠后继续", uk, i);
                     continue;
                 }
                 if (result.size() != 0) {
-                    logger.info("[hot]正在爬取第{}页数据", i);
+                    logger.info("[share]uk{} 正在爬取第{}页数据", uk, i);
                     result.forEach(o1 -> {
                         JSONObject u = JSON.parseObject(String.valueOf(o1));
-                        storage.product(jedis, u.getString("hot_uk"));
+                        //TODO 处理
                     });
                 } else
                     break;
             } catch (Exception e) {
                 //被封禁, 切换代理然后重试
-                logger.warn("[hot]第{}页检测到被封禁ip, 正在尝试切换代理", i);
+                logger.warn("[share]uk{} 第{}页检测到被封禁ip, 正在尝试切换代理", uk, i);
                 proxyManager.switchProxy();
                 continue;
             }
@@ -77,7 +75,7 @@ public class HotUkCrawlerTask implements Runnable {
             i ++;
         }
 
-        logger.info("[hot]热门uk爬取任务结束");
+        logger.info("[share]uk{} uk共享文件爬取任务结束", uk);
     }
 
 }

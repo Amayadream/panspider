@@ -4,8 +4,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 /**
- * @author: xjding
- * @date: 2017-04-26 09:17
+ * @author : Amayadream
+ * @date : 2017-04-26 09:17
  */
 public class RedisManager {
 

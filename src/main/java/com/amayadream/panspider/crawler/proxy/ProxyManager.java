@@ -14,8 +14,8 @@ public class ProxyManager {
 
     private static Logger logger = LoggerFactory.getLogger(ProxyManager.class);
 
-    public static ProxyManager proxyManager;
-    public static final Object syncLock = new Object();
+    private static ProxyManager proxyManager;
+    private static final Object syncLock = new Object();
 
     private Jedis jedis;
     private String[] ipAndPort;
@@ -24,6 +24,11 @@ public class ProxyManager {
         this.jedis = jedis;
     }
 
+    /**
+     * 初始化
+     * @param jedis jedis
+     * @return
+     */
     public static ProxyManager getInstance(Jedis jedis) {
         if (proxyManager == null) {
             synchronized (syncLock) {
@@ -62,6 +67,7 @@ public class ProxyManager {
 
     /**
      * 删除不可用代理并切换到新的代理
+     * @param ipAndPort [ip, port]
      */
     public synchronized void removeProxy(String[] ipAndPort) {
         jedis.srem(Constants.REDIS_KEY_PROXY_IP, ipAndPort[0] + ":" + ipAndPort[1]);
