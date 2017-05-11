@@ -3,7 +3,7 @@ package com.amayadream.panspider.common.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.amayadream.panspider.crawler.proxy.ProxyManager;
+import com.amayadream.panspider.proxy.ProxyManager;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -234,6 +234,11 @@ public class Requests {
                 HttpEntity entity = response.getEntity();
                 String result = EntityUtils.toString(entity, "utf-8");
                 EntityUtils.consume(entity);
+                //简单判断非json格式, 主要应对某些代理返回的是html页面
+                if (!result.startsWith("{") && !result.startsWith("[")) {
+                    proxyManager.removeProxy(proxyManager.getProxy());
+                    return null;
+                }
                 return result;
             } else if (proxyManager.getProxy() != null) {   //有代理情况下非200则默认为代理异常, 直接移除
                 proxyManager.removeProxy(proxyManager.getProxy());
@@ -243,7 +248,7 @@ public class Requests {
             //有代理的情况下连接异常, 则移除并切换代理
             if (e.getMessage() != null
                     && (e.getMessage().contains("connect timed out") || e.getMessage().contains("Read timed out"))
-                    && proxyManager.getProxy() != null) {
+                    && (proxyManager != null && proxyManager.getProxy() != null)) {
                 logger.error("[requests]执行请求超时, 正在切换代理并删除当前代理");
                 proxyManager.removeProxy(proxyManager.getProxy());
             } else {

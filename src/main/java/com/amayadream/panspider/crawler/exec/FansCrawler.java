@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.common.util.Requests;
-import com.amayadream.panspider.crawler.proxy.ProxyManager;
+import com.amayadream.panspider.proxy.ProxyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;

@@ -1,8 +1,8 @@
 package com.amayadream.panspider.crawler;
 
 import com.amayadream.panspider.crawler.exec.*;
-import com.amayadream.panspider.crawler.proxy.ProxyCrawler;
-import com.amayadream.panspider.crawler.proxy.ProxyManager;
+import com.amayadream.panspider.proxy.ProxyCrawler;
+import com.amayadream.panspider.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -40,7 +40,7 @@ public class TaskExecutor {
 
         ShareCrawler shareCrawler = new ShareCrawler(jedis, storage, proxyManager);
 
-        service.execute(proxyCrawler);
+//        service.execute(proxyCrawler);
         Thread.sleep(5000);
 
         service.execute(hotUkTask);

@@ -1,4 +1,4 @@
-package com.amayadream.panspider.crawler.proxy;
+package com.amayadream.panspider.proxy;
 
 import com.amayadream.panspider.common.util.Constants;
 import com.amayadream.panspider.common.util.Requests;
