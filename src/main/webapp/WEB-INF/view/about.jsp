@@ -6,13 +6,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-    <title>叮叮搜索</title>
+    <title>关于</title>
     <jsp:include page="include/commonfile.jsp"/>
-    <style>
-        .search-input {
-            margin-top: 250px;
-        }
-    </style>
 </head>
 <body>
 
@@ -38,38 +33,6 @@
         </div>
     </div>
 </nav>
-
-<div class="container">
-    <div class="search-input">
-        <div class="col-lg-10">
-            <input type="text" class="form-control input-lg" id="input" placeholder="请输入关键词..." autofocus>
-        </div>
-        <div class="col-lg-2">
-            <button type="button" class="btn btn-lg btn-success" id="submit">网盘搜索</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    $(function () {
-        $(document).keyup(function(event){
-            if(event.keyCode ===13){
-                $("#submit").trigger("click");
-            }
-        });
-        $("#submit").on("click", function () {
-            var $input = $("#input");
-            var q = $input.val();
-            if (q === null || q === undefined || q === '' || $.trim(q) === ''){
-                layer.msg('请输入关键字!', { offset: 0, shift: 6 });
-                $input.focus();
-                return false;
-            }
-            window.location = "${ctx}/search?q=" + encodeURIComponent(q);
-        });
-    });
-
-</script>
 
 </body>
 </html>

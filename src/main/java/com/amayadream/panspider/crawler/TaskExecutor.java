@@ -6,6 +6,7 @@ import com.amayadream.panspider.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -24,6 +25,8 @@ public class TaskExecutor {
         BeanFactory factory = (BeanFactory) context;
 
         JedisPool pool = factory.getBean(JedisPool.class);
+        MongoTemplate mongoTemplate = factory.getBean(MongoTemplate.class);
+
         Jedis jedis = pool.getResource();
 
         Storage storage = new Storage();
@@ -40,15 +43,25 @@ public class TaskExecutor {
 
         ShareCrawler shareCrawler = new ShareCrawler(jedis, storage, proxyManager);
 
-//        service.execute(proxyCrawler);
-        Thread.sleep(5000);
+        ShareSave shareSave = new ShareSave(jedis, storage, mongoTemplate);
 
+        //1.爬取代理
+        service.execute(proxyCrawler);
+        Thread.sleep(50000);
+
+        //2.爬取热门uk
         service.execute(hotUkTask);
         Thread.sleep(10000);
 
+        //3.开启粉丝/订阅爬取
         service.execute(fansTask);
         service.execute(followTask);
+
+        //4.开启share爬取
         service.execute(shareCrawler);
+
+        //5.开启share构建索引和入库
+        service.execute(shareSave);
 
     }
 

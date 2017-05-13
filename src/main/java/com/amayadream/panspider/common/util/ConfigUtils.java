@@ -1,13 +1,19 @@
 package com.amayadream.panspider.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStreamReader;
 import java.util.Properties;
 
 /**
+ * 配置文件帮助类
  * @author :  Amayadream
  * @date :  2017.04.26 22:35
  */
 public class ConfigUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
 
     private static final String configpath = "/config/dynamic.config.properties";
 
@@ -27,13 +33,13 @@ public class ConfigUtils {
                 properties.load(reader);
                 lasttime = System.currentTimeMillis();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("[configUtils]读取配置文件错误, 错误原因: {}", e.getMessage());
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("[configUtils]关闭reader出错!");
                     }
                 }
             }

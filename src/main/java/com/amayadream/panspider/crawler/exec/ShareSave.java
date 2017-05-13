@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.amayadream.panspider.crawler.model.Share;
 import com.amayadream.panspider.crawler.model.ShareFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -17,6 +19,8 @@ import java.util.List;
  * @date :   2017-05-10 15:20
  */
 public class ShareSave implements Runnable {
+
+    private static Logger logger = LoggerFactory.getLogger(ShareSave.class);
 
     private Jedis jedis;
     private Storage storage;
@@ -58,6 +62,9 @@ public class ShareSave implements Runnable {
                 share.setFiles(shareFiles);
             }
             mongoTemplate.save(share);
+            logger.info("[shareSave] {} 已存入mongo库中!", share.getShareId());
+
+            //TODO 根据title构建索引
         }
     }
 

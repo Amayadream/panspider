@@ -5,11 +5,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!-- 引入配置文件 -->
     <context:property-placeholder location="classpath:config/config.properties" />
-
-    <bean id="redisManager" class="com.amayadream.panspider.common.util.RedisManager">
-        <constructor-arg name="jedisPool" ref="jedisPool"/>
-    </bean>
 
     <!-- redis连接池配置 -->
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
@@ -44,6 +41,11 @@
         <!--<constructor-arg name="password" value="${redis.single.password}" />-->
         <constructor-arg name="timeout" value="${redis.timeout}" />
         <!--<constructor-arg name="database" value="${redis.database.index}" />-->
+    </bean>
+
+    <!-- redis管理器 -->
+    <bean id="redisManager" class="com.amayadream.panspider.common.util.RedisManager">
+        <constructor-arg name="jedisPool" ref="jedisPool"/>
     </bean>
 
 </beans>
