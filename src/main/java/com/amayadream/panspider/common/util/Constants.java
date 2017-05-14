@@ -38,7 +38,8 @@ public class Constants {
     public static final String PROXY_URL_XICI = "http://api.xicidaili.com/free2016.txt";
     public static final String PROXY_URL_66IP = "http://www.66ip.cn/nmtq.php?getnum=100&isp=0&anonymoustype=0&start=&ports=&export=&ipaddress=&area=0&proxytype=2&api=66ip";
 
-
+    /** 构建索引重试次数 */
+    public static final int ES_BUILD_INDEX_TIME = 3;
 
 
 }

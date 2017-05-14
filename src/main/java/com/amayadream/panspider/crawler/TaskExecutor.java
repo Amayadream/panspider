@@ -1,5 +1,6 @@
 package com.amayadream.panspider.crawler;
 
+import com.amayadream.panspider.common.util.ElasticSearchManager;
 import com.amayadream.panspider.crawler.exec.*;
 import com.amayadream.panspider.proxy.ProxyCrawler;
 import com.amayadream.panspider.proxy.ProxyManager;
@@ -26,6 +27,7 @@ public class TaskExecutor {
 
         JedisPool pool = factory.getBean(JedisPool.class);
         MongoTemplate mongoTemplate = factory.getBean(MongoTemplate.class);
+        ElasticSearchManager elasticSearchManager = factory.getBean(ElasticSearchManager.class);
 
         Jedis jedis = pool.getResource();
 
@@ -43,7 +45,7 @@ public class TaskExecutor {
 
         ShareCrawler shareCrawler = new ShareCrawler(jedis, storage, proxyManager);
 
-        ShareSave shareSave = new ShareSave(jedis, storage, mongoTemplate);
+        ShareSave shareSave = new ShareSave(jedis, storage, mongoTemplate, elasticSearchManager);
 
         //1.爬取代理
         service.execute(proxyCrawler);
