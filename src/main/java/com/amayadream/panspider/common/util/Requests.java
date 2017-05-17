@@ -235,7 +235,7 @@ public class Requests {
                 String result = EntityUtils.toString(entity, "utf-8");
                 EntityUtils.consume(entity);
                 //简单判断非json格式, 主要应对某些代理返回的是html页面
-                if (!result.startsWith("{") && !result.startsWith("[")) {
+                if (result.contains("</html>")) {
                     proxyManager.removeProxy(proxyManager.getProxy());
                     return null;
                 }

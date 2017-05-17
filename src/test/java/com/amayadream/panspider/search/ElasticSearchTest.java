@@ -11,7 +11,6 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
@@ -74,12 +73,40 @@ public class ElasticSearchTest {
                 .setScroll(new TimeValue(60000))
                 .setQuery(qb)
                 .setSize(100).get();
-        do {
-            for (SearchHit hit : response.getHits().getHits()) {
-                System.out.println(JSON.toJSONString(hit.getSource()));
-            }
+
+        long count = response.getHits().getTotalHits();
+        for (int i = 0, sum = 0; sum < count; i++) {
+            response.getHits().forEach(
+                    (hit) -> {
+                        System.out.println(JSON.toJSONString(hit.getSource()));
+                    }
+            );
+            sum += response.getHits().getHits().length;
+            System.out.println("总量"+count+" 已经查到"+sum);
             response = client.prepareSearchScroll(response.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
-        } while (response.getHits().getHits().length != 0);
+        }
+    }
+
+    @Test
+    public void searchP() {
+        QueryBuilder qb = multiMatchQuery(
+                "jpg",
+                "title", "shareFile"
+        );
+        SearchResponse response = client.prepareSearch("share")
+                .addSort(FieldSortBuilder.DOC_FIELD_NAME, SortOrder.ASC)
+                .setQuery(qb)
+                .setSize(100)
+                .setFrom(0)
+                .get();
+        long count = response.getHits().getTotalHits();
+        System.out.println(count);
+        response.getHits().forEach(
+                (hit) -> {
+                    System.out.println(hit.getScore());
+                    System.out.println(JSON.toJSONString(hit.getSource()));
+                }
+        );
     }
 
     @After

@@ -57,7 +57,7 @@ public class ElasticSearchManager {
                     .field("shareId", share.getShareId())
                     .field("shortId", share.getShortId())
                     .field("title", share.getTitle())
-                    .array("fileNames", fileNames.toArray())
+                    .array("files", fileNames.toArray())
                     .endObject();
             IndexResponse response = client.prepareIndex("share", "share", share.getShareId())
                     .setSource(builder)

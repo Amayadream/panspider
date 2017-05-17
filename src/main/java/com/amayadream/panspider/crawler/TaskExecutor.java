@@ -8,6 +8,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.web.context.WebApplicationContext;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -29,23 +30,29 @@ public class TaskExecutor {
         MongoTemplate mongoTemplate = factory.getBean(MongoTemplate.class);
         ElasticSearchManager elasticSearchManager = factory.getBean(ElasticSearchManager.class);
 
-        Jedis jedis = pool.getResource();
+        Jedis jedis1 = pool.getResource();
+        Jedis jedis2 = pool.getResource();
+        Jedis jedis3 = pool.getResource();
+        Jedis jedis4 = pool.getResource();
+        Jedis jedis5 = pool.getResource();
+        Jedis jedis6 = pool.getResource();
+        Jedis jedis7 = pool.getResource();
 
         Storage storage = new Storage();
-        ProxyManager proxyManager = ProxyManager.getInstance(jedis);
+        ProxyManager proxyManager = ProxyManager.getInstance(jedis1);
 
         ExecutorService service = Executors.newCachedThreadPool();
         ExecutorService validatorService = Executors.newFixedThreadPool(3);
 
-        ProxyCrawler proxyCrawler = new ProxyCrawler(jedis, validatorService);
+        ProxyCrawler proxyCrawler = new ProxyCrawler(jedis2, validatorService);
 
-        UkCrawler hotUkTask = new UkCrawler(jedis, storage, proxyManager);
-        FansCrawler fansTask = new FansCrawler(jedis, storage, proxyManager);
-        FollowCrawler followTask = new FollowCrawler(jedis, storage, proxyManager);
+        UkCrawler hotUkTask = new UkCrawler(jedis3, storage, proxyManager);
+        FansCrawler fansTask = new FansCrawler(jedis4, storage, proxyManager);
+        FollowCrawler followTask = new FollowCrawler(jedis5, storage, proxyManager);
 
-        ShareCrawler shareCrawler = new ShareCrawler(jedis, storage, proxyManager);
+        ShareCrawler shareCrawler = new ShareCrawler(jedis6, storage, proxyManager);
 
-        ShareSave shareSave = new ShareSave(jedis, storage, mongoTemplate, elasticSearchManager);
+        ShareSave shareSave = new ShareSave(jedis7, storage, mongoTemplate, elasticSearchManager);
 
         //1.爬取代理
         service.execute(proxyCrawler);

@@ -1,5 +1,7 @@
 package com.amayadream.panspider.web.controller;
 
+import com.amayadream.panspider.common.util.ElasticSearchManager;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +22,8 @@ public class IndexController {
 
     @Resource
     private MongoTemplate mongoTemplate;
+    @Resource
+    private ElasticSearchManager elasticSearchManager;
 
     @RequestMapping(value = "")
     public String redirect() {
@@ -36,7 +40,10 @@ public class IndexController {
      * @param q 关键词
      */
     @RequestMapping(value = "/search")
-    public String search(@RequestParam String q, Model model) {
+    public String search(@RequestParam String q, @RequestParam(defaultValue = "1") int pageNo, Model model) {
+
+
+
         model.addAttribute("q", q);
         return "/result";
     }

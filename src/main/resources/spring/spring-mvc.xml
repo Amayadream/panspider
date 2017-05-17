@@ -28,7 +28,7 @@
     <task:scheduler id="qbScheduler" pool-size="10"/>
 
     <!-- 静态资源映射 -->
-    <mvc:resources mapping="/static/**" location="/static/"/>
+    <!--<mvc:resources mapping="/static/**" location="/static/"/>-->
 
     <!-- ElasticSearch配置 -->
     <bean id="elasticSearchManager" class="com.amayadream.panspider.common.util.ElasticSearchManager">
